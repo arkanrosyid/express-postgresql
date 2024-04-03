@@ -1,11 +1,14 @@
-const { password } = require('pg/lib/defaults');
 const userModel = require('../model/userModel');
 const bcrypt = require('bcrypt');
+const crypto = require('crypto');
 
 
 const userController = {
-   
-  createUser : async (req, res) => {
+   test : async (req, res) => {
+    key = crypto.randomBytes(64).toString('hex');
+    res.send(key);
+   },
+  createUser : async (req, res, next) => {
     hashedPassword = await bcrypt.hash(req.body.password, 10);
     try {
       const user = await userModel.create({
@@ -16,7 +19,7 @@ const userController = {
       });
       res.json(user);
     } catch (error) {
-      res.status(500).json({ error: error.message });
+      next(error);
     }
   },
 
@@ -25,7 +28,7 @@ const userController = {
       const users = await userModel.findAll();
       res.json(users);
     } catch (error) {
-      res.status(500).json({ error: error.message });
+        next(error);
     }
   },
 };
